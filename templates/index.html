@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Flask To-Do App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Theme toggle button -->
+        <div class="theme-toggle" onclick="toggleTheme()">🌙 Toggle Theme</div>
+
+        <h1>📝 My To-Do List</h1>
+
+        <form action="/add" method="post" class="task-form">
+            <input type="text" name="task" placeholder="Enter a task" required>
+            <input type="date" name="due">
+            <button type="submit">Add Task</button>
+        </form>
+
+        <div class="section">
+            <h2>📌 To-Do Tasks</h2>
+            <ul>
+                {% for task in tasks %}
+                    {% if not task.done %}
+                        <li>
+                            <form action="/toggle/{{ loop.index0 }}" method="post" class="inline-form">
+                                <input type="checkbox" onclick="this.form.submit()">
+                            </form>
+                            <span>{{ task.text }}</span>
+                            {% if task.due %}<small>(Due: {{ task.due }})</small>{% endif %}
+                            <a href="/delete/{{ loop.index0 }}">❌</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>✅ Completed Tasks</h2>
+            <ul>
+                {% for task in tasks %}
+                    {% if task.done %}
+                        <li class="done">
+                            <form action="/toggle/{{ loop.index0 }}" method="post" class="inline-form">
+                                <input type="checkbox" onclick="this.form.submit()" checked>
+                            </form>
+                            <span>{{ task.text }}</span>
+                            {% if task.due %}<small>(Due: {{ task.due }})</small>{% endif %}
+                            <a href="/delete/{{ loop.index0 }}">❌</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <a href="/clear" class="clear-btn">🧹 Clear All Tasks</a>
+    </div>
+
+    <!-- Theme toggle script -->
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle("dark-mode");
+            const isDark = document.body.classList.contains("dark-mode");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+        }
+
+        window.onload = () => {
+            if (localStorage.getItem("theme") === "dark") {
+                document.body.classList.add("dark-mode");
+            }
+        };
+    </script>
+</body>
+</html>
+
+
